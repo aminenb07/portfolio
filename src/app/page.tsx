@@ -8,12 +8,9 @@ import Foreword from '@/components/sections/Foreword';
 import SkillsIndex from '@/components/sections/SkillsIndex';
 import ArchivedNotes from '@/components/sections/ArchivedNotes';
 import Epilogue from '@/components/sections/Epilogue';
-import PageTurner from '@/components/PageTurner';
-import { useAudioManager } from '@/components/AudioManager';
 
 export default function Home() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const { playFlipSound } = useAudioManager();
 
     useEffect(() => {
         // Initial fade in of the entire book container
@@ -27,14 +24,23 @@ export default function Home() {
     }, []);
 
     // Simple visual separator mimicking a blank area between chapters
-    const ChapterSeparator = () => (
-        <div style={{ height: '30vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    const ChapterSeparator = ({ num }: { num: string }) => (
+        <div style={{ height: '20vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+            <div style={{
+                fontFamily: 'var(--font-fell), serif',
+                fontSize: '0.7rem',
+                color: 'var(--ink-faded)',
+                opacity: 0.4,
+                marginBottom: '1rem'
+            }}>
+                &mdash; p. {num} &mdash;
+            </div>
             <div style={{
                 width: '4px',
                 height: '4px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--ink-faded)',
-                opacity: 0.3,
+                opacity: 0.2,
                 boxShadow: '-20px 0 0 var(--ink-faded), 20px 0 0 var(--ink-faded)'
             }} />
         </div>
@@ -43,13 +49,15 @@ export default function Home() {
     return (
         <div ref={containerRef} style={{ opacity: 0 }}>
             <BookContainer>
-                <PageTurner onPageFlip={playFlipSound}>
-                    <Cover />
-                    <Foreword />
-                    <SkillsIndex />
-                    <ArchivedNotes />
-                    <Epilogue />
-                </PageTurner>
+                <Cover />
+                <ChapterSeparator num="01" />
+                <Foreword />
+                <ChapterSeparator num="02" />
+                <SkillsIndex />
+                <ChapterSeparator num="03" />
+                <ArchivedNotes />
+                <ChapterSeparator num="04" />
+                <Epilogue />
             </BookContainer>
         </div>
     );

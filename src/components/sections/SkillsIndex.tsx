@@ -98,9 +98,13 @@ const SkillsIndex = () => {
                     width: '100%',
                     borderBottom: '1px solid var(--paper-dark)',
                     paddingBottom: '1rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline'
                 }}
             >
-                Caput II. &mdash; Index of Skills
+                <span>Caput II. &mdash; Index of Skills</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 02</span>
             </div>
 
             <div

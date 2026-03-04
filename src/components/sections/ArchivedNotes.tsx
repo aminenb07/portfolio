@@ -97,9 +97,13 @@ const ArchivedNotes = () => {
                     width: '100%',
                     borderBottom: '1px solid var(--paper-dark)',
                     paddingBottom: '1rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline'
                 }}
             >
-                Caput III. &mdash; Archived Notes
+                <span>Caput III. &mdash; Archived Notes</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 03</span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8rem' }}>
@@ -112,25 +116,28 @@ const ArchivedNotes = () => {
                             }
                         }}
                         style={{
-                            backgroundColor: 'var(--paper-base)',
-                            padding: '3rem',
-                            boxShadow: '2px 4px 15px rgba(0,0,0,0.05), border: 1px solid var(--paper-dark)',
+                            backgroundColor: 'white', // Slightly brighter than paper for contrast
+                            padding: '4rem 3rem 3rem 3rem',
+                            boxShadow: '0 5px 20px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05)',
                             position: 'relative',
-                            borderRadius: '2px', // Slight imperfection
+                            borderRadius: '1px',
+                            border: '1px solid var(--paper-dark)',
+                            transform: `rotate(${idx % 2 === 0 ? -0.5 : 0.5}deg)`,
                         }}
                     >
-                        {/* Vintage 'Paper Clip' or tape illusion via top border/shadow */}
+                        {/* Washi Tape / Paper Strip effect */}
                         <div
                             style={{
                                 position: 'absolute',
-                                top: '-10px',
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                width: '60px',
-                                height: '20px',
-                                backgroundColor: 'rgba(255, 255, 255, 0.4)',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                zIndex: 2,
+                                top: '-15px',
+                                left: idx % 2 === 0 ? '20%' : '70%',
+                                width: '80px',
+                                height: '30px',
+                                background: 'rgba(232, 223, 209, 0.4)',
+                                border: '1px solid rgba(0,0,0,0.05)',
+                                backdropFilter: 'blur(1px)',
+                                transform: `rotate(${idx % 2 === 0 ? 5 : -5}deg)`,
+                                zIndex: 10,
                             }}
                         />
 

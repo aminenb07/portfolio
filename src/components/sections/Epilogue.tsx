@@ -64,9 +64,13 @@ const Epilogue = () => {
                     width: '100%',
                     borderBottom: '1px solid var(--paper-dark)',
                     paddingBottom: '1rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline'
                 }}
             >
-                Caput IV. &mdash; The Epilogue
+                <span>Caput IV. &mdash; The Epilogue</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 06</span>
             </div>
 
             <div

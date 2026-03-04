@@ -3,15 +3,12 @@
 import { useState, useEffect, useCallback, useRef, createContext, useContext } from 'react';
 import VintageControls from './VintageControls';
 
-// Rename to avoid conflict with browser's AudioContext type
-const GlobalAudioContext = createContext<{ playFlipSound: () => void }>({ playFlipSound: () => { } });
+const GlobalAudioContext = createContext<{ playRustle: () => void }>({ playRustle: () => { } });
 
 export default function AudioManager({ children }: { children: React.ReactNode }) {
     const [isMuted, setIsMuted] = useState(true);
-    // Use the native AudioContext type explicitly
-    const audioContextRef = useRef<window.AudioContext | null>(null);
+    const audioContextRef = useRef<any>(null);
     const lastScrollPos = useRef(0);
-    const scrollSoundNode = useRef<AudioBufferSourceNode | null>(null);
     const gainNode = useRef<GainNode | null>(null);
 
     const initAudio = () => {
@@ -26,7 +23,7 @@ export default function AudioManager({ children }: { children: React.ReactNode }
         }
     };
 
-    const playTick = (frequency: number = 800, duration: number = 0.05, volume: number = 0.05) => {
+    const playDryTick = (frequency: number = 800, duration: number = 0.02, volume: number = 0.02) => {
         if (isMuted || !audioContextRef.current) return;
         const ctx = audioContextRef.current;
         if (ctx.state === 'suspended') ctx.resume();
@@ -36,10 +33,10 @@ export default function AudioManager({ children }: { children: React.ReactNode }
 
         osc.type = 'sine';
         osc.frequency.setValueAtTime(frequency, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(frequency / 2, ctx.currentTime + duration);
+        osc.frequency.exponentialRampToValueAtTime(frequency / 4, ctx.currentTime + duration);
 
         g.gain.setValueAtTime(volume, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
 
         osc.connect(g);
         g.connect(ctx.destination);
@@ -48,45 +45,36 @@ export default function AudioManager({ children }: { children: React.ReactNode }
         osc.stop(ctx.currentTime + duration);
     };
 
-    // Synthesize a "thud/rustle" for page flips
-    const playFlipSound = useCallback(() => {
+    // Subtle page rustle for section entries
+    const playRustle = useCallback(() => {
         if (isMuted) return;
         initAudio();
         if (!audioContextRef.current) return;
 
         const ctx = audioContextRef.current;
-
-        // Thump
-        const osc = ctx.createOscillator();
-        const gThump = ctx.createGain();
-        osc.frequency.setValueAtTime(150, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.3);
-        gThump.gain.setValueAtTime(0.1, ctx.currentTime);
-        gThump.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
-        osc.connect(gThump);
-        gThump.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.3);
-
-        // Rustle (Noise)
-        const bufferSize = ctx.sampleRate * 0.4;
+        const bufferSize = ctx.sampleRate * 0.2;
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
         const source = ctx.createBufferSource();
         source.buffer = buffer;
+
         const filter = ctx.createBiquadFilter();
-        filter.type = 'bandpass';
-        filter.frequency.setValueAtTime(800, ctx.currentTime);
-        const gRustle = ctx.createGain();
-        gRustle.gain.setValueAtTime(0.05, ctx.currentTime);
-        gRustle.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4);
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(2000, ctx.currentTime);
+
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.03, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+
         source.connect(filter);
-        filter.connect(gRustle);
-        gRustle.connect(ctx.destination);
+        filter.connect(g);
+        g.connect(ctx.destination);
         source.start();
     }, [isMuted]);
 
+    // Very subtle friction sound
     const createScrollSound = () => {
         if (!audioContextRef.current) return;
         const ctx = audioContextRef.current;
@@ -94,19 +82,22 @@ export default function AudioManager({ children }: { children: React.ReactNode }
         const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const data = buffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
         const source = ctx.createBufferSource();
         source.buffer = buffer;
         source.loop = true;
+
         const filter = ctx.createBiquadFilter();
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1000, ctx.currentTime);
+        filter.frequency.setValueAtTime(600, ctx.currentTime);
+
         const g = ctx.createGain();
         g.gain.setValueAtTime(0, ctx.currentTime);
+
         source.connect(filter);
         filter.connect(g);
         g.connect(ctx.destination);
         source.start();
-        scrollSoundNode.current = source;
         gainNode.current = g;
     };
 
@@ -129,7 +120,7 @@ export default function AudioManager({ children }: { children: React.ReactNode }
             if (isMuted || !gainNode.current || !audioContextRef.current) return;
             const velocity = Math.abs(window.scrollY - lastScrollPos.current);
             lastScrollPos.current = window.scrollY;
-            const targetGain = Math.min(0.06, velocity / 1500);
+            const targetGain = Math.min(0.04, velocity / 2000);
             gainNode.current.gain.setTargetAtTime(targetGain, audioContextRef.current.currentTime, 0.05);
             clearTimeout(scrollTimeout);
             scrollTimeout = setTimeout(() => {
@@ -143,7 +134,7 @@ export default function AudioManager({ children }: { children: React.ReactNode }
     }, [isMuted]);
 
     useEffect(() => {
-        const handleSelectionChange = () => { if (!isMuted) playTick(400, 0.02, 0.02); };
+        const handleSelectionChange = () => { if (!isMuted) playDryTick(400, 0.015, 0.015); };
         document.addEventListener('selectionchange', handleSelectionChange);
         return () => document.removeEventListener('selectionchange', handleSelectionChange);
     }, [isMuted]);
@@ -151,14 +142,14 @@ export default function AudioManager({ children }: { children: React.ReactNode }
     useEffect(() => {
         const handleMouseOver = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
-            if (target.closest('a') || target.closest('button')) playTick(1200, 0.03, 0.03);
+            if (target.closest('a') || target.closest('button')) playDryTick(1000, 0.02, 0.02);
         };
         window.addEventListener('mouseover', handleMouseOver);
         return () => window.removeEventListener('mouseover', handleMouseOver);
     }, [isMuted]);
 
     return (
-        <GlobalAudioContext.Provider value={{ playFlipSound }}>
+        <GlobalAudioContext.Provider value={{ playRustle }}>
             <VintageControls isMuted={isMuted} toggleMute={() => setIsMuted(!isMuted)} />
             {children}
         </GlobalAudioContext.Provider>

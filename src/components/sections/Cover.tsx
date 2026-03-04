@@ -43,6 +43,24 @@ const Cover = () => {
                 duration: 1.5
             }, "-=1.2");
 
+        // Soft reveal for natural document entrance (applies to the whole container)
+        gsap.fromTo(containerRef.current,
+            { opacity: 0, filter: 'blur(4px)', y: 10 },
+            {
+                opacity: 1,
+                filter: 'blur(0px)',
+                y: 0,
+                duration: 2,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top top", // Starts when the top of the trigger hits the top of the viewport
+                    scrub: true, // Links animation progress to scroll position
+                    end: "bottom top", // Ends when the bottom of the trigger hits the top of the viewport
+                }
+            }
+        );
+
         // Scroll fade out
         ScrollTrigger.create({
             trigger: containerRef.current,

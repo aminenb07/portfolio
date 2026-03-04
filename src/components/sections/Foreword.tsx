@@ -65,9 +65,13 @@ const Foreword = () => {
                     width: '100%',
                     borderBottom: '1px solid var(--paper-dark)',
                     paddingBottom: '1rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline'
                 }}
             >
-                Caput I. &mdash; Foreword
+                <span>Caput I. &mdash; Foreword</span>
+                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 01</span>
             </div>
 
             <div

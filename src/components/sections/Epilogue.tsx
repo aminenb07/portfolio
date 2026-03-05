@@ -12,11 +12,11 @@ const Epilogue = () => {
             }}
         >
             <div
+                className="font-body"
                 style={{
-                    fontFamily: 'var(--font-lora), serif',
                     maxWidth: '600px',
                     width: '100%',
-                    fontSize: '1.1rem',
+                    fontSize: '1.2rem',
                     lineHeight: '1.8',
                     position: 'relative',
                 }}
@@ -37,12 +37,8 @@ const Epilogue = () => {
                 >
                     <a
                         href="mailto:hello@example.com"
-                        className="ink-underline ligatures"
-                        data-cursor="active"
-                        data-sound="hover"
-                        data-sound-click="true"
+                        className="ink-underline ligatures font-editorial small-caps"
                         style={{
-                            fontFamily: 'var(--font-garamond), serif',
                             fontSize: '2rem',
                             color: 'var(--ink-red)',
                             padding: '0.5rem 1rem',
@@ -53,6 +49,7 @@ const Epilogue = () => {
                         hello@example.com
                         {/* Fake wax stamp/postmark overlay */}
                         <div
+                            className="font-editorial"
                             style={{
                                 position: 'absolute',
                                 top: '-25px',
@@ -66,7 +63,6 @@ const Epilogue = () => {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                fontFamily: 'var(--font-fell), serif',
                                 fontSize: '0.55rem',
                                 color: 'rgba(139, 58, 58, 0.3)',
                                 textAlign: 'center',

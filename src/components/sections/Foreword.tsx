@@ -13,24 +13,23 @@ const Foreword = () => {
             }}
         >
             <div
+                className="font-body"
                 style={{
-                    fontFamily: 'var(--font-lora), serif',
                     maxWidth: 'var(--max-width-text)',
                     width: '100%',
-                    fontSize: '1.1rem',
+                    fontSize: '1.2rem',
                     lineHeight: '1.8',
                     position: 'relative',
                 }}
             >
                 <p>
                     <span
-                        className="ligatures"
+                        className="ligatures font-display"
                         style={{
-                            fontFamily: 'var(--font-garamond), serif',
                             float: 'left',
-                            fontSize: '4.5rem',
+                            fontSize: '5rem',
                             lineHeight: '0.8',
-                            marginRight: '0.5rem',
+                            marginRight: '0.75rem',
                             color: 'var(--ink-red)',
                         }}
                     >

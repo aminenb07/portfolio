@@ -15,9 +15,8 @@ const Cover = () => {
             }}
         >
             <h1
-                className="ligatures"
+                className="ligatures font-display embossed"
                 style={{
-                    fontFamily: 'var(--font-garamond), serif',
                     fontSize: 'clamp(3rem, 8vw, 6rem)',
                     letterSpacing: '-0.02em',
                     marginBottom: '1.5rem',
@@ -29,13 +28,13 @@ const Cover = () => {
             </h1>
 
             <p
-                className="small-caps"
+                className="small-caps font-editorial"
                 style={{
-                    fontFamily: 'var(--font-fell), serif',
-                    fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+                    fontSize: 'clamp(1.2rem, 2.5vw, 1.5rem)',
                     color: 'var(--ink-faded)',
                     maxWidth: '600px',
                     margin: '0 auto',
+                    letterSpacing: '0.15em'
                 }}
             >
                 Creative Front-End Engineer & Designer

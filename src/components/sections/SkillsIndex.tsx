@@ -55,9 +55,8 @@ const SkillsIndex = () => {
                 {skillsData.map((section) => (
                     <div key={section.category}>
                         <h3
-                            className="small-caps"
+                            className="small-caps font-editorial"
                             style={{
-                                fontFamily: 'var(--font-fell), serif',
                                 fontSize: '1.2rem',
                                 borderBottom: '1px dotted var(--ink-faded)',
                                 paddingBottom: '0.5rem',
@@ -69,11 +68,11 @@ const SkillsIndex = () => {
                         </h3>
 
                         <ul
+                            className="font-body"
                             style={{
                                 listStyle: 'none',
                                 padding: 0,
                                 margin: 0,
-                                fontFamily: 'var(--font-lora), serif',
                                 fontSize: '1rem',
                             }}
                         >

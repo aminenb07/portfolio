@@ -1,30 +1,37 @@
 import type { Metadata } from "next";
-import { EB_Garamond, Lora, IM_Fell_English_SC } from "next/font/google";
+import { EB_Garamond, IM_Fell_English_SC, Uncial_Antiqua, Inknut_Antiqua } from "next/font/google";
 import "./globals.css";
-import NotebookShell from "@/components/layout/NotebookShell";
 
-const garamond = EB_Garamond({
+const ebGaramond = EB_Garamond({
   subsets: ["latin"],
   variable: "--font-garamond",
-  display: "swap"
+  display: "swap",
 });
 
-const lora = Lora({
-  subsets: ["latin"],
-  variable: "--font-lora",
-  display: "swap"
-});
-
-const fellEnglish = IM_Fell_English_SC({
+const imFell = IM_Fell_English_SC({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-fell",
-  display: "swap"
+  display: "swap",
+});
+
+const uncial = Uncial_Antiqua({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-uncial",
+  display: "swap",
+});
+
+const inknut = Inknut_Antiqua({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-inknut",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "A. Nabou - Journal",
-  description: "Antique Journal Portfolio",
+  title: "Amine Nabou | Portfolio",
+  description: "Creative Front-End Engineer & Designer Portfolio - Volume MMXXIV",
 };
 
 export default function RootLayout({
@@ -33,9 +40,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${garamond.variable} ${lora.variable} ${fellEnglish.variable}`}>
-      <body className="font-body">
-        <NotebookShell>{children}</NotebookShell>
+    <html lang="en" className={`${ebGaramond.variable} ${imFell.variable} ${uncial.variable} ${inknut.variable}`}>
+      <body className="antialiased">
+        {children}
       </body>
     </html>
   );

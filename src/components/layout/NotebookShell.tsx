@@ -1,26 +1,37 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import TextureBackground from "@/components/ui/TextureBackground";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import CustomCursor from "@/components/ui/CustomCursor";
-import SoundToggle from "@/components/ui/SoundToggle";
-import ReduceMotionToggle from "@/components/ui/ReduceMotionToggle";
-import { createAudioEngine, AudioEngine } from "@/lib/audio";
+import BookCover from "@/components/layout/BookCover";
+import BookSettingsPanel from "@/components/layout/BookSettingsPanel";
+
+type BookSettings = {
+    coverTitle: string;
+    coverSubtitle: string;
+    theme: "parchment" | "sepia" | "midnight-ink" | "library-green" | "burgundy";
+    ornament: "none" | "border" | "emblem";
+    paperTexture: "low" | "medium";
+    fontPairing: "A" | "B";
+};
 
 type NotebookShellContextValue = {
-    isSoundEnabled: boolean;
-    isMuted: boolean;
     reduceMotion: boolean;
-    enableSound: () => void;
-    toggleMute: () => void;
-    toggleReduceMotion: () => void;
-    setSectionMood: (sectionId: string) => void;
-    playRustle: () => void;
-    playHover: () => void;
-    playClick: () => void;
-    startFriction: () => void;
-    stopFriction: () => void;
+    isBookOpen: boolean;
+    openBook: () => void;
+    settings: BookSettings;
+    updateSettings: (updater: (prev: BookSettings) => BookSettings) => void;
 };
+
+const DEFAULT_SETTINGS: BookSettings = {
+    coverTitle: "Amine Nabou",
+    coverSubtitle: "Creative Front-End Engineer & Designer",
+    theme: "parchment",
+    ornament: "border",
+    paperTexture: "low",
+    fontPairing: "A"
+};
+
+const STORAGE_KEY = "book-settings-v1";
 
 const NotebookShellContext = createContext<NotebookShellContextValue | null>(null);
 
@@ -33,191 +44,136 @@ export const useNotebookShell = () => {
 };
 
 const NotebookShell = ({ children }: { children: React.ReactNode }) => {
-    const audioRef = useRef<AudioEngine | null>(null);
-    const hoverCooldown = useRef(0);
-    const [isSoundEnabled, setIsSoundEnabled] = useState(false);
-    const [isMuted, setIsMuted] = useState(true);
     const [reduceMotion, setReduceMotion] = useState(false);
-    const [hasMotionOverride, setHasMotionOverride] = useState(false);
-    const [tintColor, setTintColor] = useState("transparent");
-    const [vignetteOpacity, setVignetteOpacity] = useState(0.12);
+    const [isBookOpen, setIsBookOpen] = useState(false);
+    const [settings, setSettings] = useState<BookSettings>(DEFAULT_SETTINGS);
 
-    const ensureAudio = useCallback(() => {
-        if (!audioRef.current) {
-            audioRef.current = createAudioEngine();
-        }
-        return audioRef.current;
-    }, []);
-
-    const enableSound = useCallback(() => {
-        setIsSoundEnabled(true);
-        setIsMuted(false);
-        const engine = ensureAudio();
-        engine.enable();
-        engine.setMuted(false);
-    }, [ensureAudio]);
-
-    const toggleMute = useCallback(() => {
-        setIsMuted((prev) => {
-            const next = !prev;
-            audioRef.current?.setMuted(next);
-            return next;
-        });
-    }, []);
-
-    const toggleReduceMotion = useCallback(() => {
-        setHasMotionOverride(true);
-        setReduceMotion((prev) => !prev);
-    }, []);
-
-    const playRustle = useCallback(() => {
-        if (!isSoundEnabled || isMuted) return;
-        ensureAudio().playRustle();
-    }, [isMuted, isSoundEnabled, ensureAudio]);
-
-    const playHover = useCallback(() => {
-        if (!isSoundEnabled || isMuted) return;
-        ensureAudio().playHover();
-    }, [isMuted, isSoundEnabled, ensureAudio]);
-
-    const playClick = useCallback(() => {
-        if (!isSoundEnabled || isMuted) return;
-        ensureAudio().playClick();
-    }, [isMuted, isSoundEnabled, ensureAudio]);
-
-    const startFriction = useCallback(() => {
-        if (!isSoundEnabled || isMuted) return;
-        ensureAudio().startFriction();
-    }, [isMuted, isSoundEnabled, ensureAudio]);
-
-    const stopFriction = useCallback(() => {
-        audioRef.current?.stopFriction();
-    }, []);
-
-    const setSectionMood = useCallback((sectionId: string) => {
-        let tint = "transparent";
-        let vignette = 0.12;
-
-        switch (sectionId) {
-            case "cover":
-                tint = "rgba(139, 115, 85, 0.02)";
-                vignette = 0.1;
-                break;
-            case "foreword":
-                tint = "rgba(44, 42, 40, 0.01)";
-                vignette = 0.13;
-                break;
-            case "skills":
-                tint = "rgba(139, 58, 58, 0.02)";
-                vignette = 0.16;
-                break;
-            case "projects":
-                tint = "rgba(44, 42, 40, 0.02)";
-                vignette = 0.18;
-                break;
-            case "contact":
-                tint = "rgba(139, 115, 85, 0.03)";
-                vignette = 0.14;
-                break;
-            default:
-                tint = "transparent";
-                vignette = 0.12;
-        }
-
-        setTintColor(tint);
-        setVignetteOpacity(vignette);
-    }, []);
-
+    // Sync reduced-motion with system preference
     useEffect(() => {
         const media = window.matchMedia("(prefers-reduced-motion: reduce)");
         const syncPreference = () => {
-            if (!hasMotionOverride) {
-                setReduceMotion(media.matches);
-            }
+            setReduceMotion(media.matches);
         };
         syncPreference();
         media.addEventListener("change", syncPreference);
         return () => media.removeEventListener("change", syncPreference);
-    }, [hasMotionOverride]);
+    }, []);
 
-    useEffect(() => {
-        document.body.style.setProperty("--tint-color", tintColor);
-        document.body.style.setProperty("--vignette-opacity", vignetteOpacity.toString());
-    }, [tintColor, vignetteOpacity]);
-
+    // Apply reduced-motion class for global CSS
     useEffect(() => {
         document.body.classList.toggle("reduce-motion", reduceMotion);
-        if (reduceMotion) {
-            stopFriction();
-        }
-    }, [reduceMotion, stopFriction]);
+    }, [reduceMotion]);
 
+    // Load settings from localStorage
     useEffect(() => {
-        if (!isSoundEnabled || isMuted) return;
+        if (typeof window === "undefined") return;
+        try {
+            const raw = window.localStorage.getItem(STORAGE_KEY);
+            if (!raw) return;
+            const parsed = JSON.parse(raw) as Partial<BookSettings>;
+            setSettings((prev) => ({ ...prev, ...parsed }));
+        } catch {
+            // ignore corrupted storage
+        }
+    }, []);
 
-        const onHover = (event: MouseEvent) => {
-            const target = event.target as HTMLElement;
-            if (!target.closest("[data-sound='hover']")) return;
-            const now = Date.now();
-            if (now - hoverCooldown.current < 300) return;
-            hoverCooldown.current = now;
-            playHover();
-        };
+    // Persist settings
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        try {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch {
+            // ignore quota errors
+        }
+    }, [settings]);
 
-        const onClick = (event: PointerEvent) => {
-            const target = event.target as HTMLElement;
-            if (!target.closest("[data-sound-click='true'], button, a")) return;
-            playClick();
-        };
+    // Map theme + paper texture to CSS variables for surfaces and ink
+    useEffect(() => {
+        const root = document.documentElement;
 
-        window.addEventListener("mouseover", onHover);
-        window.addEventListener("pointerdown", onClick);
-        return () => {
-            window.removeEventListener("mouseover", onHover);
-            window.removeEventListener("pointerdown", onClick);
-        };
-    }, [isMuted, isSoundEnabled, playHover, playClick]);
+        let themeColor = "#f4efe6";
+        let paperSurface = "#f7f2e9";
+        let paperEdge = "rgba(44, 42, 40, 0.08)";
+        let inkColor = "#2c2a28";
+        let inkFaded = "#5c5853";
+
+        switch (settings.theme) {
+            case "parchment":
+                themeColor = "#f4efe6";
+                paperSurface = "#f7f2e9";
+                paperEdge = "rgba(44, 42, 40, 0.08)";
+                inkColor = "#2c2a28";
+                inkFaded = "#5c5853";
+                break;
+            case "sepia":
+                themeColor = "#e8dfd1";
+                paperSurface = "#f3e4cb";
+                paperEdge = "rgba(44, 42, 40, 0.16)";
+                inkColor = "#3b2a1a";
+                inkFaded = "#7a6a58";
+                break;
+            case "midnight-ink":
+                themeColor = "#1a1b1e";
+                paperSurface = "#23262b";
+                paperEdge = "rgba(249, 245, 233, 0.22)";
+                inkColor = "#f4efe6";
+                inkFaded = "#a19d99";
+                break;
+            case "library-green":
+                themeColor = "#2d3e34";
+                paperSurface = "#33493c";
+                paperEdge = "rgba(244, 239, 230, 0.24)";
+                inkColor = "#f4efe6";
+                inkFaded = "#c8c1b8";
+                break;
+            case "burgundy":
+                themeColor = "#4a1c1c";
+                paperSurface = "#5c2730";
+                paperEdge = "rgba(244, 239, 230, 0.24)";
+                inkColor = "#f4efe6";
+                inkFaded = "#d9c7c0";
+                break;
+        }
+
+        root.style.setProperty("--theme-current", themeColor);
+        root.style.setProperty("--paper-surface", paperSurface);
+        root.style.setProperty("--paper-edge", paperEdge);
+        root.style.setProperty("--ink-main", inkColor);
+        root.style.setProperty("--ink-faded", inkFaded);
+
+        const textureOpacity = settings.paperTexture === "low" ? "0.05" : "0.1";
+        root.style.setProperty("--texture-opacity", textureOpacity);
+    }, [settings.theme, settings.paperTexture]);
+
+    const openBook = useCallback(() => {
+        setIsBookOpen(true);
+    }, []);
+
+    const updateSettings = useCallback((updater: (prev: BookSettings) => BookSettings) => {
+        setSettings((prev) => updater(prev));
+    }, []);
 
     const value = useMemo(
         () => ({
-            isSoundEnabled,
-            isMuted,
             reduceMotion,
-            enableSound,
-            toggleMute,
-            toggleReduceMotion,
-            setSectionMood,
-            playRustle,
-            playHover,
-            playClick,
-            startFriction,
-            stopFriction
+            isBookOpen,
+            openBook,
+            settings,
+            updateSettings
         }),
-        [
-            isSoundEnabled,
-            isMuted,
-            reduceMotion,
-            enableSound,
-            toggleMute,
-            toggleReduceMotion,
-            setSectionMood,
-            playRustle,
-            playHover,
-            playClick,
-            startFriction,
-            stopFriction
-        ]
+        [reduceMotion, isBookOpen, settings, openBook, updateSettings]
     );
 
     return (
         <NotebookShellContext.Provider value={value}>
-            <TextureBackground reduceMotion={reduceMotion} />
             <CustomCursor reduceMotion={reduceMotion} />
-            <div className="notebook-controls">
-                <SoundToggle isEnabled={isSoundEnabled} isMuted={isMuted} onEnable={enableSound} onToggleMute={toggleMute} />
-                <ReduceMotionToggle enabled={reduceMotion} onToggle={toggleReduceMotion} />
-            </div>
-            <main className="notebook-shell">
+            <BookCover />
+            <BookSettingsPanel />
+            <main className={`notebook-shell ${isBookOpen ? "open" : ""}`} style={{
+                opacity: isBookOpen ? 1 : 0,
+                transition: 'opacity 0.8s ease 0.4s',
+                pointerEvents: isBookOpen ? 'auto' : 'none'
+            }}>
                 {children}
             </main>
         </NotebookShellContext.Provider>

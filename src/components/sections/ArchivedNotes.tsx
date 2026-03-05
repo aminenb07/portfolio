@@ -1,167 +1,101 @@
 "use client";
 
-import { ExternalLink } from 'lucide-react';
+import { Github, ArrowUpRight } from 'lucide-react';
+import { Repository } from '@/lib/github';
 
-const projects = [
-    {
-        id: "fig-i",
-        title: "Project Alpha: E-Commerce",
-        figure: "Figure I.",
-        date: "A.D. 2023",
-        description: "An archival study in fluid commerce dynamics. The architecture relies heavily on Next.js edge caching and a bespoke Three.js product viewer, mimicking the meticulous nature of a watchmaker's catalog.",
-        link: "https://example.com/alpha",
-        tags: ["Next.js", "Three.js", "Stripe"]
-    },
-    {
-        id: "fig-ii",
-        title: "Project Beta: The Reading Room",
-        figure: "Figure II.",
-        date: "A.D. 2023",
-        description: "A spatial interface for consuming long-form literature. Typography was rigorously scaled to a golden ratio scale, and GSAP was employed to simulate the kinetic friction of turning a heavy manuscript page.",
-        link: "https://example.com/beta",
-        tags: ["React", "GSAP", "Typography"]
-    },
-    {
-        id: "fig-iii",
-        title: "Project Gamma: Data Visualizer",
-        figure: "Figure III.",
-        date: "A.D. 2024",
-        description: "Translating raw telemetry into charting forms reminiscent of early 20th-century astronomical mapped data. D3.js paired with an SVG noise filter provided the necessary gravitas.",
-        link: "https://example.com/gamma",
-        tags: ["Vue", "D3.js", "SVG"]
-    }
-];
+interface ArchivedNotesProps {
+  repos: Repository[];
+}
 
-const ArchivedNotes = () => {
-    return (
+const ArchivedNotes = ({ repos }: ArchivedNotesProps) => {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '6rem' }}>
+      {repos.map((repo, idx) => (
         <div
-            style={{
-                paddingTop: '4rem',
-                paddingBottom: '8rem',
-                maxWidth: '800px',
-                margin: '0 auto',
-            }}
+          key={repo.id}
+          className="project-card"
+          style={{
+            transform: `rotate(${idx % 2 === 0 ? -0.3 : 0.3}deg)`
+          }}
         >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8rem' }}>
-                {projects.map((project, idx) => (
-                    <div
-                        key={project.id}
-                        className="card-shadow"
-                        data-cursor="active"
-                        data-sound="hover"
-                        style={{
-                            backgroundColor: 'white',
-                            padding: '4rem 3rem 3rem 3rem',
-                            position: 'relative',
-                            borderRadius: '1px',
-                            transform: `rotate(${idx % 2 === 0 ? -0.5 : 0.5}deg)`,
-                        }}
-                    >
-                        {/* Washi Tape / Paper Strip effect */}
-                        <div
-                            style={{
-                                position: 'absolute',
-                                top: '-15px',
-                                left: idx % 2 === 0 ? '15%' : '75%',
-                                width: '70px',
-                                height: '28px',
-                                background: 'rgba(232, 223, 209, 0.3)',
-                                border: '1px solid rgba(0,0,0,0.03)',
-                                backdropFilter: 'blur(1px)',
-                                transform: `rotate(${idx % 2 === 0 ? 3 : -3}deg)`,
-                                zIndex: 10,
-                            }}
-                        />
+          {repo.isFeatured && <div className="archive-stamp">Featured Exhibit</div>}
+          
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'baseline', 
+            marginBottom: '1.5rem',
+            borderBottom: '1px solid var(--paper-edge)',
+            paddingBottom: '1rem'
+          }}>
+            <span className="font-editorial" style={{ fontSize: '0.7rem', color: 'var(--ink-faded)' }}>
+              ENTRY NO. {String(idx + 1).padStart(3, '0')}
+            </span>
+            <span className="font-editorial" style={{ fontSize: '0.7rem', color: 'var(--ink-faded)' }}>
+              UPDATED: {new Date(repo.updated_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase()}
+            </span>
+          </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2rem' }}>
-                            <span
-                                className="small-caps"
-                                style={{
-                                    fontFamily: 'var(--font-fell), serif',
-                                    color: 'var(--ink-red)',
-                                    fontSize: '0.9rem',
-                                    letterSpacing: '0.1em'
-                                }}
-                            >
-                                {project.figure}
-                            </span>
-                            <span
-                                style={{
-                                    fontFamily: 'var(--font-fell), serif',
-                                    color: 'var(--ink-faded)',
-                                    fontSize: '0.8rem'
-                                }}
-                            >
-                                Date: {project.date}
-                            </span>
-                        </div>
+          <h3 className="font-classic" style={{ fontSize: '1.8rem', marginBottom: '1rem', color: 'var(--ink-main)' }}>
+            {repo.name}
+          </h3>
 
-                        <h3
-                            style={{
-                                fontFamily: 'var(--font-garamond), serif',
-                                fontSize: '2rem',
-                                marginBottom: '1rem',
-                                color: 'var(--ink-main)',
-                            }}
-                        >
-                            {project.title}
-                        </h3>
+          <p className="font-body" style={{ fontSize: '1.1rem', lineHeight: '1.6', color: 'var(--ink-main)', marginBottom: '2rem', minHeight: '3em' }}>
+            {repo.description || "An undocumented digital artifact from the archives."}
+          </p>
 
-                        <p
-                            style={{
-                                fontFamily: 'var(--font-lora), serif',
-                                lineHeight: '1.8',
-                                color: 'var(--ink-main)',
-                                marginBottom: '2.5rem',
-                            }}
-                        >
-                            {project.description}
-                        </p>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                {project.tags.map(tag => (
-                                    <span
-                                        key={tag}
-                                        style={{
-                                            fontFamily: 'var(--font-fell), serif',
-                                            fontSize: '0.75rem',
-                                            fontStyle: 'italic',
-                                            color: 'var(--ink-faded)'
-                                        }}
-                                    >
-                                        #{tag.toLowerCase()}
-                                    </span>
-                                ))}
-                            </div>
-
-                            <a
-                                href={project.link}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="ink-underline ligatures"
-                                data-cursor="active"
-                                data-sound="hover"
-                                data-sound-click="true"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    fontFamily: 'var(--font-fell), serif',
-                                    textTransform: 'uppercase',
-                                    fontSize: '0.75rem',
-                                    letterSpacing: '0.1em',
-                                    color: 'var(--ink-red)',
-                                }}
-                            >
-                                View Manifest <ExternalLink size={14} />
-                            </a>
-                        </div>
-                    </div>
-                ))}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {repo.language && (
+                <span className="font-editorial small-caps" style={{ fontSize: '0.65rem', color: 'var(--ink-red)', opacity: 0.8 }}>
+                  • {repo.language}
+                </span>
+              )}
+              <span className="font-editorial small-caps" style={{ fontSize: '0.65rem', color: 'var(--ink-faded)', opacity: 0.8 }}>
+                • {repo.stargazers_count} Stars
+              </span>
             </div>
+
+            <div style={{ display: 'flex', gap: '1.5rem' }}>
+              <a
+                href={repo.html_url}
+                target="_blank"
+                rel="noreferrer"
+                className="ink-underline font-editorial small-caps"
+                style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--ink-main)' }}
+              >
+                Source <Github size={14} />
+              </a>
+              {repo.homepage && (
+                <a
+                  href={repo.homepage}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ink-underline font-editorial small-caps"
+                  style={{ fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--ink-red)' }}
+                >
+                  Live <ArrowUpRight size={14} />
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Ribbon effect on hover - handled via CSS in globals */}
+          <div className="bookmark-ribbon" style={{
+            position: 'absolute',
+            left: '2rem',
+            top: '-10px',
+            width: '12px',
+            height: '40px',
+            background: 'var(--ink-red)',
+            opacity: 0,
+            transition: 'all 0.4s ease',
+            clipPath: 'polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%)'
+          }} />
         </div>
-    );
+      ))}
+    </div>
+  );
 };
 
 export default ArchivedNotes;

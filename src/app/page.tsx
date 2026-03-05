@@ -1,64 +1,55 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import BookContainer from '@/components/BookContainer';
+import { useMemo, useState } from 'react';
 import Cover from '@/components/sections/Cover';
 import Foreword from '@/components/sections/Foreword';
 import SkillsIndex from '@/components/sections/SkillsIndex';
 import ArchivedNotes from '@/components/sections/ArchivedNotes';
 import Epilogue from '@/components/sections/Epilogue';
+import PaperSection from '@/components/ui/PaperSection';
+import { useActiveSection } from '@/hooks/useActiveSection';
+import { useScrollSound } from '@/hooks/useScrollSound';
+import { useNotebookShell } from '@/components/layout/NotebookShell';
 
 export default function Home() {
-    const containerRef = useRef<HTMLDivElement>(null);
+    const { setSectionMood, playRustle, startFriction, stopFriction, isSoundEnabled, isMuted, reduceMotion } = useNotebookShell();
+    const [activeSection, setActiveSection] = useState<string | null>(null);
+    const sectionIds = useMemo(() => ['cover', 'foreword', 'skills', 'projects', 'contact'], []);
 
-    useEffect(() => {
-        // Initial fade in of the entire book container
-        if (containerRef.current) {
-            gsap.to(containerRef.current, {
-                opacity: 1,
-                duration: 2,
-                ease: "power2.inOut"
-            });
+    useActiveSection({
+        sectionIds,
+        setActiveSection,
+        onSectionEnter: (id) => {
+            setSectionMood(id);
+            if (isSoundEnabled && !isMuted) {
+                playRustle();
+            }
         }
-    }, []);
+    });
 
-    // Simple visual separator mimicking a blank area between chapters
-    const ChapterSeparator = ({ num }: { num: string }) => (
-        <div style={{ height: '20vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-            <div style={{
-                fontFamily: 'var(--font-fell), serif',
-                fontSize: '0.7rem',
-                color: 'var(--ink-faded)',
-                opacity: 0.4,
-                marginBottom: '1rem'
-            }}>
-                &mdash; p. {num} &mdash;
-            </div>
-            <div style={{
-                width: '4px',
-                height: '4px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--ink-faded)',
-                opacity: 0.2,
-                boxShadow: '-20px 0 0 var(--ink-faded), 20px 0 0 var(--ink-faded)'
-            }} />
-        </div>
-    );
+    useScrollSound({
+        enabled: isSoundEnabled && !isMuted && !reduceMotion,
+        startFriction,
+        stopFriction
+    });
 
     return (
-        <div ref={containerRef} style={{ opacity: 0 }}>
-            <BookContainer>
+        <div className="notebook-content" data-active-section={activeSection ?? undefined}>
+            <PaperSection id="cover" pageNumber="01">
                 <Cover />
-                <ChapterSeparator num="01" />
+            </PaperSection>
+            <PaperSection id="foreword" pageNumber="02">
                 <Foreword />
-                <ChapterSeparator num="02" />
+            </PaperSection>
+            <PaperSection id="skills" pageNumber="03">
                 <SkillsIndex />
-                <ChapterSeparator num="03" />
+            </PaperSection>
+            <PaperSection id="projects" pageNumber="04">
                 <ArchivedNotes />
-                <ChapterSeparator num="04" />
+            </PaperSection>
+            <PaperSection id="contact" pageNumber="05">
                 <Epilogue />
-            </BookContainer>
+            </PaperSection>
         </div>
     );
 }

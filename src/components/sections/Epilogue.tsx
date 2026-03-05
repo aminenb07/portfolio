@@ -1,80 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
 const Epilogue = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const letterRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        if (mediaQuery.matches) return;
-
-        if (!containerRef.current || !letterRef.current) return;
-
-        // Ink settle effect for the letter
-        gsap.fromTo(letterRef.current,
-            {
-                opacity: 0,
-                filter: 'blur(3px)',
-                scale: 0.98,
-            },
-            {
-                opacity: 1,
-                filter: 'blur(0px)',
-                scale: 1,
-                duration: 1.5,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: "top 60%",
-                }
-            }
-        );
-
-        return () => {
-            ScrollTrigger.getAll().forEach(t => t.kill());
-        };
-    }, []);
-
     return (
-        <section
-            ref={containerRef}
+        <div
             style={{
-                minHeight: '80vh',
-                paddingTop: '6rem',
-                paddingBottom: '10rem', // Extra space at bottom of book
+                minHeight: '70vh',
+                padding: '4rem 0 12rem 0',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
             }}
         >
             <div
-                className="small-caps"
-                style={{
-                    fontFamily: 'var(--font-fell), serif',
-                    fontSize: '0.8rem',
-                    color: 'var(--ink-faded)',
-                    marginBottom: '4rem',
-                    textAlign: 'center',
-                    width: '100%',
-                    borderBottom: '1px solid var(--paper-dark)',
-                    paddingBottom: '1rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'baseline'
-                }}
-            >
-                <span>Caput IV. &mdash; The Epilogue</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 06</span>
-            </div>
-
-            <div
-                ref={letterRef}
                 style={{
                     fontFamily: 'var(--font-lora), serif',
                     maxWidth: '600px',
@@ -100,26 +37,17 @@ const Epilogue = () => {
                 >
                     <a
                         href="mailto:hello@example.com"
-                        className="ligatures small-caps"
+                        className="ink-underline ligatures"
+                        data-cursor="active"
+                        data-sound="hover"
+                        data-sound-click="true"
                         style={{
                             fontFamily: 'var(--font-garamond), serif',
                             fontSize: '2rem',
                             color: 'var(--ink-red)',
-                            textDecoration: 'none',
-                            borderBottom: '1px solid transparent',
-                            transition: 'border-color 0.3s ease',
-                            padding: '0.5rem 2rem',
+                            padding: '0.5rem 1rem',
                             display: 'inline-block',
                             position: 'relative',
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.borderBottomColor = 'var(--ink-red)';
-                            // Simulate a wax stamp press or ink blot scaling
-                            e.currentTarget.style.transform = 'scale(1.02)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.borderBottomColor = 'transparent';
-                            e.currentTarget.style.transform = 'scale(1)';
                         }}
                     >
                         hello@example.com
@@ -127,11 +55,11 @@ const Epilogue = () => {
                         <div
                             style={{
                                 position: 'absolute',
-                                top: '-20px',
-                                right: '-30px',
-                                width: '60px',
-                                height: '60px',
-                                border: '2px solid rgba(139, 58, 58, 0.2)', // Faded red
+                                top: '-25px',
+                                right: '-40px',
+                                width: '70px',
+                                height: '70px',
+                                border: '2px solid rgba(139, 58, 58, 0.15)',
                                 borderRadius: '50%',
                                 pointerEvents: 'none',
                                 transform: 'rotate(-15deg)',
@@ -139,10 +67,10 @@ const Epilogue = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 fontFamily: 'var(--font-fell), serif',
-                                fontSize: '0.5rem',
-                                color: 'rgba(139, 58, 58, 0.4)',
+                                fontSize: '0.55rem',
+                                color: 'rgba(139, 58, 58, 0.3)',
                                 textAlign: 'center',
-                                lineHeight: '1',
+                                lineHeight: '1.1',
                             }}
                         >
                             POST<br />APPROVED
@@ -150,20 +78,19 @@ const Epilogue = () => {
                     </a>
                 </div>
 
-                <p style={{ textAlign: 'right', marginTop: '4rem' }}>
+                <p style={{ textAlign: 'right', marginTop: '4rem', fontStyle: 'italic', opacity: 0.8 }}>
                     Yours faithfully,
                 </p>
 
-                {/* Synthetic Signature */}
                 <div style={{ textAlign: 'right', marginTop: '1rem' }}>
-                    <svg width="200" height="60" viewBox="0 0 200 60" style={{ display: 'inline-block', fill: 'none', stroke: 'var(--ink-main)', strokeWidth: '1.5', strokeLinecap: 'round' }}>
+                    <svg width="200" height="60" viewBox="0 0 200 60" style={{ display: 'inline-block', fill: 'none', stroke: 'var(--ink-main)', strokeWidth: '1.2', strokeLinecap: 'round', opacity: 0.8 }}>
                         <path d="M 20 40 Q 30 10 40 40 T 60 40 Q 80 50 90 20 T 110 40 Q 130 50 140 30 T 160 40 Q 180 20 190 40" strokeDasharray="300" strokeDashoffset="0">
-                            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="2s" fill="freeze" />
+                            <animate attributeName="stroke-dashoffset" from="300" to="0" dur="2.5s" fill="freeze" />
                         </path>
                     </svg>
                 </div>
             </div>
-        </section>
+        </div>
     );
 };
 

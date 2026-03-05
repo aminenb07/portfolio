@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { EB_Garamond, Lora, IM_Fell_English_SC } from "next/font/google";
 import "./globals.css";
-import VignetteOverlay from "@/components/VignetteOverlay";
-import CursorTracker from "@/components/CursorTracker";
-import AudioManager from "@/components/AudioManager";
+import NotebookShell from "@/components/layout/NotebookShell";
 
 const garamond = EB_Garamond({
   subsets: ["latin"],
@@ -37,11 +35,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${garamond.variable} ${lora.variable} ${fellEnglish.variable}`}>
       <body className="font-body">
-        <VignetteOverlay />
-        <CursorTracker />
-        <AudioManager>
-          {children}
-        </AudioManager>
+        <NotebookShell>{children}</NotebookShell>
       </body>
     </html>
   );

@@ -1,11 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
-
 const skillsData = [
     {
         category: 'I. Languages',
@@ -42,71 +36,13 @@ const skillsData = [
 ];
 
 const SkillsIndex = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const listRefs = useRef<(HTMLUListElement | null)[]>([]);
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        if (mediaQuery.matches) return;
-
-        if (!containerRef.current) return;
-
-        listRefs.current.forEach((list, index) => {
-            if (!list) return;
-
-            gsap.fromTo(list.children,
-                {
-                    opacity: 0,
-                    x: -15
-                },
-                {
-                    opacity: 1,
-                    x: 0,
-                    duration: 0.8,
-                    stagger: 0.1,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: list,
-                        start: "top 85%",
-                    }
-                }
-            );
-        });
-
-        return () => {
-            ScrollTrigger.getAll().forEach(t => t.kill());
-        };
-    }, []);
-
     return (
-        <section
-            ref={containerRef}
+        <div
             style={{
-                minHeight: '80vh',
-                paddingTop: '6rem',
-                paddingBottom: '4rem',
+                minHeight: '70vh',
+                padding: '4rem 0',
             }}
         >
-            <div
-                className="small-caps"
-                style={{
-                    fontFamily: 'var(--font-fell), serif',
-                    fontSize: '0.8rem',
-                    color: 'var(--ink-faded)',
-                    marginBottom: '4rem',
-                    textAlign: 'center',
-                    width: '100%',
-                    borderBottom: '1px solid var(--paper-dark)',
-                    paddingBottom: '1rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'baseline'
-                }}
-            >
-                <span>Caput II. &mdash; Index of Skills</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 02</span>
-            </div>
-
             <div
                 style={{
                     display: 'grid',
@@ -116,7 +52,7 @@ const SkillsIndex = () => {
                     margin: '0 auto',
                 }}
             >
-                {skillsData.map((section, sectionIdx) => (
+                {skillsData.map((section) => (
                     <div key={section.category}>
                         <h3
                             className="small-caps"
@@ -133,11 +69,6 @@ const SkillsIndex = () => {
                         </h3>
 
                         <ul
-                            ref={(el) => {
-                                if (listRefs.current) {
-                                    listRefs.current[sectionIdx] = el;
-                                }
-                            }}
                             style={{
                                 listStyle: 'none',
                                 padding: 0,
@@ -146,7 +77,7 @@ const SkillsIndex = () => {
                                 fontSize: '1rem',
                             }}
                         >
-                            {section.items.map((item, itemIdx) => (
+                            {section.items.map((item) => (
                                 <li
                                     key={item.name}
                                     style={{
@@ -186,7 +117,7 @@ const SkillsIndex = () => {
                     </div>
                 ))}
             </div>
-        </section>
+        </div>
     );
 };
 

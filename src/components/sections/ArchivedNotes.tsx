@@ -1,11 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ExternalLink } from 'lucide-react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 const projects = [
     {
@@ -38,90 +33,27 @@ const projects = [
 ];
 
 const ArchivedNotes = () => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        if (mediaQuery.matches) return;
-
-        cardRefs.current.forEach((card, index) => {
-            if (!card) return;
-
-            // Slight parallax and rotation on scroll
-            gsap.fromTo(card,
-                {
-                    opacity: 0.5,
-                    y: 50,
-                    rotation: index % 2 === 0 ? -2 : 2, // Alternate slants like messy stacked papers
-                },
-                {
-                    opacity: 1,
-                    y: 0,
-                    rotation: index % 2 === 0 ? -0.5 : 0.5, // Settle closer to straight
-                    duration: 1.2,
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 80%",
-                        end: "top 40%",
-                        scrub: 1, // Smooth scrubbing
-                    }
-                }
-            );
-        });
-
-        return () => {
-            ScrollTrigger.getAll().forEach(t => t.kill());
-        };
-    }, []);
-
     return (
-        <section
-            ref={containerRef}
+        <div
             style={{
-                paddingTop: '6rem',
+                paddingTop: '4rem',
                 paddingBottom: '8rem',
                 maxWidth: '800px',
                 margin: '0 auto',
             }}
         >
-            <div
-                className="small-caps"
-                style={{
-                    fontFamily: 'var(--font-fell), serif',
-                    fontSize: '0.8rem',
-                    color: 'var(--ink-faded)',
-                    marginBottom: '6rem',
-                    textAlign: 'center',
-                    width: '100%',
-                    borderBottom: '1px solid var(--paper-dark)',
-                    paddingBottom: '1rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'baseline'
-                }}
-            >
-                <span>Caput III. &mdash; Archived Notes</span>
-                <span style={{ fontSize: '0.7rem', opacity: 0.6 }}>p. 03</span>
-            </div>
-
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8rem' }}>
                 {projects.map((project, idx) => (
                     <div
                         key={project.id}
-                        ref={(el) => {
-                            if (cardRefs.current) {
-                                cardRefs.current[idx] = el;
-                            }
-                        }}
+                        className="card-shadow"
+                        data-cursor="active"
+                        data-sound="hover"
                         style={{
-                            backgroundColor: 'white', // Slightly brighter than paper for contrast
+                            backgroundColor: 'white',
                             padding: '4rem 3rem 3rem 3rem',
-                            boxShadow: '0 5px 20px rgba(0,0,0,0.03), 0 1px 3px rgba(0,0,0,0.05)',
                             position: 'relative',
                             borderRadius: '1px',
-                            border: '1px solid var(--paper-dark)',
                             transform: `rotate(${idx % 2 === 0 ? -0.5 : 0.5}deg)`,
                         }}
                     >
@@ -130,13 +62,13 @@ const ArchivedNotes = () => {
                             style={{
                                 position: 'absolute',
                                 top: '-15px',
-                                left: idx % 2 === 0 ? '20%' : '70%',
-                                width: '80px',
-                                height: '30px',
-                                background: 'rgba(232, 223, 209, 0.4)',
-                                border: '1px solid rgba(0,0,0,0.05)',
+                                left: idx % 2 === 0 ? '15%' : '75%',
+                                width: '70px',
+                                height: '28px',
+                                background: 'rgba(232, 223, 209, 0.3)',
+                                border: '1px solid rgba(0,0,0,0.03)',
                                 backdropFilter: 'blur(1px)',
-                                transform: `rotate(${idx % 2 === 0 ? 5 : -5}deg)`,
+                                transform: `rotate(${idx % 2 === 0 ? 3 : -3}deg)`,
                                 zIndex: 10,
                             }}
                         />
@@ -180,7 +112,7 @@ const ArchivedNotes = () => {
                                 fontFamily: 'var(--font-lora), serif',
                                 lineHeight: '1.8',
                                 color: 'var(--ink-main)',
-                                marginBottom: '2rem',
+                                marginBottom: '2.5rem',
                             }}
                         >
                             {project.description}
@@ -193,7 +125,7 @@ const ArchivedNotes = () => {
                                         key={tag}
                                         style={{
                                             fontFamily: 'var(--font-fell), serif',
-                                            fontSize: '0.8rem',
+                                            fontSize: '0.75rem',
                                             fontStyle: 'italic',
                                             color: 'var(--ink-faded)'
                                         }}
@@ -207,20 +139,20 @@ const ArchivedNotes = () => {
                                 href={project.link}
                                 target="_blank"
                                 rel="noreferrer"
+                                className="ink-underline ligatures"
+                                data-cursor="active"
+                                data-sound="hover"
+                                data-sound-click="true"
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.5rem',
                                     fontFamily: 'var(--font-fell), serif',
                                     textTransform: 'uppercase',
-                                    fontSize: '0.8rem',
+                                    fontSize: '0.75rem',
                                     letterSpacing: '0.1em',
                                     color: 'var(--ink-red)',
-                                    borderBottom: '1px solid transparent',
-                                    transition: 'border-color 0.2s ease',
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.borderBottomColor = 'var(--ink-red)'}
-                                onMouseLeave={(e) => e.currentTarget.style.borderBottomColor = 'transparent'}
                             >
                                 View Manifest <ExternalLink size={14} />
                             </a>
@@ -228,7 +160,7 @@ const ArchivedNotes = () => {
                     </div>
                 ))}
             </div>
-        </section>
+        </div>
     );
 };
 

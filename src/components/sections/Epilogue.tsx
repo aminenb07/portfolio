@@ -46,7 +46,7 @@ const Epilogue = () => {
                             position: 'relative',
                         }}
                     >
-                        hello@example.com
+                        aminenb061@gmail.com
                         {/* Fake wax stamp/postmark overlay */}
                         <div
                             className="font-editorial"

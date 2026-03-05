@@ -36,7 +36,7 @@ const Epilogue = () => {
                     }}
                 >
                     <a
-                        href="mailto:hello@example.com"
+                        href="mailto:aminenb061@gmail.com"
                         className="ink-underline ligatures font-editorial small-caps"
                         style={{
                             fontSize: '2rem',
